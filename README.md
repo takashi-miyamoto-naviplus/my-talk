@@ -1,2 +1,2 @@
 # my-talk
-files for my my talk
+files for my talk
