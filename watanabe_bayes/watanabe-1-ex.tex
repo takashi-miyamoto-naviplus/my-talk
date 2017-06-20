@@ -1,0 +1,134 @@
+\documentclass[dvipdfmx,11pt]{jsarticle}
+\usepackage{minijs}%和文用
+\usepackage{hyperref}
+\renewcommand{\kanjifamilydefault}{\gtdefault}%和文用に
+\usepackage{ascmac}
+\usepackage[all]{xy}
+\usepackage{wrapfig}
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{cancel}
+\usepackage{verbatim}
+\usepackage{fancyvrb}
+\usepackage[T1]{fontenc}%8bit フォント
+\usepackage{textcomp}%欧文フォントの追加
+\usepackage[utf8]{inputenc}%文字コードをUTF-8
+\usepackage{otf}%otfパッケージ
+\newcommand{\RR}{{\mathbb{R}}}
+\newcommand{\EE}{{\mathbb{E}}}
+
+\title{「ベイズ統計の理論と方法」}
+
+\begin{document}
+\maketitle
+
+\section*{1. はじめに}
+\subsection*{章末問題1}
+次の等式が成り立つことを示せ。
+$$\inf_\beta F_n(\beta) = \inf_{w\in W} \left\{-\sum_{i=1}^n \log p(X_i|w)\right\}.$$
+
+\begin{align*}
+F_n(\beta) &= -\frac1\beta \log Z_n(\beta) \;\;\; \Leftarrow \text{(1.13)}\\
+&= -\frac1\beta \log \int_W \varphi(w) \prod_{i=1}^n p(X_i|w)^\beta dw. \;\;\; \Leftarrow \text{(1.6)}
+\end{align*}
+ここで天下り的に$L_n(w)$を定義する。(対数尤度の$n$分の一の符号を変えたもの)
+\begin{align*}
+L_n(w) &= -\frac1n \sum_{i=1}^n \log p(X_i|w) \;\;\; \text{すると}\\
+\exp\left(-n\beta L_n(w)\right) &= \prod_{i=1}^n p(X_i|w)^\beta
+\end{align*}
+$L_n(w)$を最小にするパラメータを$\hat{w}$とすると、$nL_n(\hat{w}) \leq nL_n(w)$ ゆえ、
+\begin{align*}
+F_n(\beta) &= -\frac1\beta \log \int_W \exp\left(-n\beta L_n(w)\right)\varphi(w) dw \\
+&\geq -\frac1\beta \log \int_W \exp\left(-n\beta L_n(\hat{w})\right)\varphi(w) dw \\
+&= -\frac1\beta \log \left\{ \exp\left(-n\beta L_n(\hat{w})\right) \underbrace{\int_W \varphi(w) dw}_{=1}\right\} \\
+&= nL_n(\hat{w})
+\end{align*}
+一方、$W(\epsilon) = \{w\in W \;|\; nL_n(w) < nL_n(\hat{w}) + \epsilon\}$ とすると、被積分関数が非負で$W(\epsilon)\subset W$だから、
+$$\int_W (\dots) dw \geq \int_{W(\epsilon)} (\dots) dw, \;\; \text{よって} \;\; -\frac1\beta\int_W (\dots) dw \leq -\frac1\beta\int_{W(\epsilon)} (\dots) dw$$
+よって
+\begin{align*}
+F_n(\beta) &= -\frac1\beta \log \int_W \exp\left(-n\beta L_n(w)\right)\varphi(w) dw \\
+&\leq -\frac1\beta \log \int_{W(\epsilon)} \exp\left(-n\beta L_n(w)\right)\varphi(w) dw \\
+\end{align*}
+さらに $w \in W(\epsilon)$で、
+\begin{align*}
+n L_n(w) &< n L_n(\hat{w}) + \epsilon \\
+-n\beta L_n(w) &> -n\beta L_n(\hat{w}) -\beta \epsilon \\
+\exp(-n\beta L_n(w)) &> \exp(-n\beta L_n(\hat{w})) \exp(-\beta \epsilon) \\
+-\frac1\beta \log \int_{W(\epsilon)} \exp(-n\beta L_n(w)) \varphi(w)dw &< -\frac1\beta \log \int_{W(\epsilon)}\exp(-n\beta L_n(\hat{w})) \exp(-\beta \epsilon) \varphi(w)dw
+\end{align*}
+よって
+\begin{align*}
+F_n(\beta) &\leq -\frac1\beta \log \int_{W(\epsilon)}\exp(-n\beta L_n(\hat{w})) \exp(-\beta \epsilon) \varphi(w)dw \\
+&= nL_n(\hat{w}) + \epsilon - \frac1\beta \log \int_{W(\epsilon)}\varphi(w)dw
+\end{align*}
+よって、
+$$nL_n(\hat{w}) \leq F_n(\beta) \leq nL_n(\hat{w}) + \underbrace{\epsilon - \frac1\beta \log \int_{W(\epsilon)}\varphi(w)dw}_{\to 0 \;\text{as}\; \epsilon\to 0 \;\text{and}\; \beta\to\infty}$$
+よって$F_n(\beta)\to nL_n(\hat{w})$ で $\sup_\beta F_n(\beta) = \lim_{\beta\to\infty} F_n(\beta)$ であるが、
+$$\inf_{w\in W} \left\{-\sum_{i=1}^n \log p(X_i|w)\right\} = nL_n(\hat{w}).$$ \qed
+
+\subsection*{章末問題2}
+$L(w) = -\EE_X[\log p(X|w)]$ とするとき、次の不等式が成り立つことを示せ。
+$$\EE[F_n(\beta)] \leq \frac1\beta \log \int \exp(-\beta L(w))\varphi(w)dw$$
+
+\begin{align*}
+L_n(w) &= -\frac1n \sum_{i=1}^n \log p(X_i|w) \\
+\hat{L}(w) &= L_n(w) - L(w) \;\;\; \Rightarrow \; \EE[\hat{L}(w)] = 0\\
+F_n(\beta) &= -\frac1\beta \log \int \exp\left(-n\beta L_n(w)\right)\varphi(w) dw \\
+&= -\frac1\beta \log \underbrace{\frac{\int \exp\left(-n\beta \hat{L}(w)\right)\exp\left(-n\beta L(w)\right)\varphi(w) dw}{\int \exp\left(-n\beta L(w)\right)\varphi(w) dw}}_{\text{重み} \exp\left(-n\beta L(w)\right)\varphi(w)\text{での}\EE[\exp\left(-n\beta \hat{L}\right)]} - \frac1\beta \log \int \exp\left(-n\beta L(w)\right)\varphi(w) dw
+\end{align*}
+最後の変形は、$L_n = \hat{L}+L$ 及び $\frac1\beta \log \int \exp\left(-n\beta L(w)\right)\varphi(w) dw$ を足して引いてしたもの。
+
+$f(x) = \exp(-n\beta x)$ とおくと$f$は凸関数。するとJensenの不等式$\EE[f(x)] \geq f(\EE[x])$ を用いて、
+\begin{align*}
+\EE[\exp(-n\beta \hat{L})] &\geq \exp(-n\beta \underbrace{\EE[\hat{L}]}_{=0}) = 1
+\end{align*}
+よって$F_n(\beta)$の式の第1項は消えて、
+\begin{align*}
+F_n(\beta) &\leq - \frac1\beta \log \int \exp\left(-n\beta L(w)\right)\varphi(w) dw\qed
+\end{align*}
+
+\subsection*{章末問題3}
+例1では分散$\sigma^2>0$を定数としている。分散もパラメータとして推測する場合を考える。$s=1/\sigma^2$とおくと正規分布の式(1.25)は
+$$p(x|m,s) = \frac1{\sqrt{2\pi}}\exp\left\{-\frac{s}2 x^2 + msx - \left(\frac{m^2s}s-\frac12\log s\right)\right\}$$
+となる。この確率モデルの共役事前分布を作れ。
+
+\begin{align*}
+p(x|m,s) &= \frac1{\sqrt{2\pi}} \exp\left\{-\frac{s}{2}x^2 + msx - \left(\frac{m^2s}{2}-\frac12\log s\right) \right\} \\
+&= v(x) \exp\left( f(w) \cdot g(x)\right) \\
+v(x) &= \frac1{\sqrt{2\pi}} \\
+f(w) &= \left(-\frac{s}{2}, \; ms, \; -\frac{m^2s}{2}+\frac12\log s \right) \\
+g(x) &= \left(x^2, \; x, \; 1 \right) \;\; \Rightarrow \phi=(\phi_1, \phi_2, \phi_3) \text{で置き換える}
+\end{align*}
+$g(x)$を$\phi$で置き換えて得られる共役事前分布は、
+\begin{align*}
+\varphi(m,s|\phi) &= \frac1{z(\phi)} \exp\left\{-\frac{s}{2}\phi_1 + ms\phi_2 - \left(\frac{m^2s}{2}-\frac12\log s\right)\phi_3 \right\} \\
+&= \frac1{z(\phi)} s^{\frac{\phi_3}2}\exp\left\{-\frac{s}{2}\phi_1 + ms\phi_2 - \frac{m^2s}{2}\phi_3 \right\} 
+\end{align*}
+これは
+\begin{itemize}
+\item $m$ に関しては正規分布
+\item $s$ に関してはガンマ分布($\propto s^{\phi_3/2} e^{-s/\alpha} = \text{Gamma}(\frac{\phi_3}2, \alpha)$)
+\end{itemize}
+の形をしている。
+\begin{align*}
+z(\phi) &= \int s^{\frac{\phi_3}2} ds \int \exp\left\{-\frac{s}{2}\phi_1 + ms\phi_2 - \frac{m^2s}{2}\phi_3 \right\} dm \;\; \Rightarrow \text{先に}m\text{に関するガウス積分を実行} \\
+&= \int s^{\frac{\phi_3}2} ds \int 
+\exp\left\{-\frac{s\phi_3}2 \left(m^2 - 2 \frac{\phi_2}{\phi_3}m \right) -\frac{s\phi_1}2\right\} dm \\
+&= \int s^{\frac{\phi_3}2} ds \int 
+\exp\left\{-\frac{s\phi_3}2 \left(m - \frac{\phi_2}{\phi_3}m\right)^2 + \frac{s\phi_3}2\frac{\phi_2^2}{\phi_3^2} -\frac{s\phi_1}2\right\} dm \\
+&= \int s^{\frac{\phi_3}2} \exp\left\{ \frac{s\phi_3}2\frac{\phi_2^2}{\phi_3^2} -\frac{s\phi_1}2 \right\} ds
+\underbrace{\int \exp\left\{-\frac{s\phi_3}2 \left(m - \frac{\phi_2}{\phi_3}m\right)^2 \right\} dm}_{\sqrt{2\pi/(s\phi_3)}} \\
+&= \sqrt{\frac{2\pi}{\phi_3}} \int s^{\frac{\phi_3-1}2} \exp\left\{-\frac{\phi_1\phi_3-\phi_2^2}{2\phi_3}s\right\} ds
+\end{align*}
+
+ここでガンマ分布が
+\begin{align*}
+\text{Gamma}(x|k,\theta) &= \frac{x^{k-1}e^{-\frac{x}\theta}}{\Gamma(k)\theta^k}
+\end{align*}
+を用いると $\int s^{k-1} \exp\{-\frac{s}\theta\}ds = \Gamma(k)\theta^k$ ゆえ
+
+\begin{align*}
+z(\phi) &= \sqrt{\frac{2\pi}{\phi_3}} \left(\frac{2\phi_3}{\phi_1\phi_3-\phi_2^2}\right)^{\frac{\phi_3+1}{2}} \Gamma(\frac{\phi_3+1}{2})
+\end{align*}\qed
+\end{document}  
